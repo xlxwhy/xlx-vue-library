@@ -71,7 +71,7 @@ export default {
         }
         for (const key of keys) {
             const value = ao[key]
-            if (!value) continue;
+            if (this.isEmpty(value)) continue;
             if (Array.isArray(value)) {
                 mo[key] = [
                     ...(mo[key] ? mo[key] : []),

@@ -6,6 +6,10 @@
   "scripts": {
     "babel": "babel -d ./lib ./src/"
   },
+  "devDependencies": {
+    "axios": "0.19.0",
+    "xlx-vue-common-logger": "^0.1.0"
+  },
   "author": "",
   "license": "ISC"
 }

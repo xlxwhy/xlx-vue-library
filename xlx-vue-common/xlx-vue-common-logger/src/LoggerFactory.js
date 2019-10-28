@@ -38,23 +38,9 @@ const CONFIG = {
 class Console {
     constructor(env, options) {
         this._env = env;
+        this.env = env;
         this.config = Object.assign({}, CONFIG, options)
-        if (env) {
-            let newEnvArray = []
-            let envArray = env.split('.');
-            for (let ei = 0; ei < envArray.length; ei++) {
-                let e = envArray[ei]
-                if (newEnvArray.length == 0 || ei == envArray.length - 1) {
-                    newEnvArray.push(e)
-                } else {
-                    newEnvArray.push(e.substring(0, 1))
-                }
-            }
-
-            cut(newEnvArray, this.config.length)
-            env = newEnvArray.join('.')
-        }
-        this.env = fill(env, this.config.length);
+        this.init();
     };
     info() {
         this.out('info', ...arguments)
@@ -88,8 +74,25 @@ class Console {
         }
     };
 
-    init(config) {
-        Object.assign(this.config, config)
+    init(options) {
+        this.config = Object.assign({}, CONFIG, this.config, options)
+        let env = this._env
+        if (env) {
+            let newEnvArray = []
+            let envArray = env.split('.');
+            for (let ei = 0; ei < envArray.length; ei++) {
+                let e = envArray[ei]
+                if (newEnvArray.length == 0 || ei == envArray.length - 1) {
+                    newEnvArray.push(e)
+                } else {
+                    newEnvArray.push(e.substring(0, 1))
+                }
+            }
+
+            cut(newEnvArray, this.config.length)
+            env = newEnvArray.join('.')
+        }
+        this.env = fill(env, this.config.length);
     };
 
     tabIn() {
