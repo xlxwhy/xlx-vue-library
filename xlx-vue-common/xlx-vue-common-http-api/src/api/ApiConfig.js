@@ -58,8 +58,6 @@ const config = Object.assign({}, AxiosConfig, {
     customLoggerOptions: {
         show: true,
         level: "info",
-        tab: " |=>",
-        prefix: ""
     },
 
 })

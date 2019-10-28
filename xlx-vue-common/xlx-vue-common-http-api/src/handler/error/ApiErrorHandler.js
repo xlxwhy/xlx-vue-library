@@ -2,7 +2,7 @@
 
 import LoggerFactory from "xlx-vue-common-logger";
 
-const log = LoggerFactory.newInstance("library.http.handler.error.ApiErrorHandlerAuth")
+const log = LoggerFactory.newInstance("xlx.vue.common.http.handler.error.ApiErrorHandlerAuth")
 
 
 export default {

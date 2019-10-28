@@ -1,12 +1,9 @@
 
 export default {
-    newInstance: (env) => {
-        return new Console(env)
+    newInstance: (env, options) => {
+        return new Console(env, options)
     },
 }
-
-
-const MAX_LENGTH = 30
 
 
 function fill(value, length, emptyChar) {
@@ -31,9 +28,17 @@ function cut(newEnvArray, max) {
 }
 
 const LEVEL = ['info', 'warn', 'error']
+const CONFIG = {
+    length: 30,
+    show: true,
+    level: "info",
+    tab: "|->",
+    prefix: ""
+}
 class Console {
-    constructor(env, length) {
+    constructor(env, options) {
         this._env = env;
+        this.config = Object.assign({}, CONFIG, options)
         if (env) {
             let newEnvArray = []
             let envArray = env.split('.');
@@ -46,17 +51,10 @@ class Console {
                 }
             }
 
-            cut(newEnvArray, MAX_LENGTH)
+            cut(newEnvArray, this.config.length)
             env = newEnvArray.join('.')
-
         }
-        this.env = fill(env, length ? length : MAX_LENGTH);
-        this.config = {
-            show: true,
-            level: "info",
-            tab: "|->",
-            prefix: ""
-        };
+        this.env = fill(env, this.config.length);
     };
     info() {
         this.out('info', ...arguments)
@@ -76,8 +74,6 @@ class Console {
         this.tabOut()
         this.out('info', ...arguments)
     };
-
-
 
     out(level) {
         let config = this.config
