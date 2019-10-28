@@ -42,38 +42,6 @@ class Console {
         this.config = Object.assign({}, CONFIG, options)
         this.init();
     };
-    info() {
-        this.out('info', ...arguments)
-    };
-    warn() {
-        this.out('warn', ...arguments)
-    };
-    error() {
-        this.out('error', ...arguments)
-    };
-
-    start() {
-        this.out('info', ...arguments)
-        this.tabIn()
-    };
-    end() {
-        this.tabOut()
-        this.out('info', ...arguments)
-    };
-
-    out(level) {
-        let config = this.config
-        if (config && config.show) {
-            let wantLevelIndex = LEVEL.indexOf(level)
-            let limitLevelIndex = LEVEL.indexOf(config.level)
-            if (level && console[level] && limitLevelIndex <= wantLevelIndex) {
-                let type = level == 'info' ? " " : "X"
-                type = level == 'warn' ? "!" : type
-                console['info']("" + this.env, type + ":" + this.config.prefix, ...Array.prototype.slice.call(arguments, 1))
-            }
-        }
-    };
-
     init(options) {
         this.config = Object.assign({}, CONFIG, this.config, options)
         let env = this._env
@@ -93,6 +61,18 @@ class Console {
             env = newEnvArray.join('.')
         }
         this.env = fill(env, this.config.length);
+    };
+    out(level) {
+        let config = this.config
+        if (config && config.show) {
+            let wantLevelIndex = LEVEL.indexOf(level)
+            let limitLevelIndex = LEVEL.indexOf(config.level)
+            if (level && console[level] && limitLevelIndex <= wantLevelIndex) {
+                let type = level == 'info' ? " " : "X"
+                type = level == 'warn' ? "!" : type
+                console['info']("" + this.env, type + ":" + this.config.prefix, ...Array.prototype.slice.call(arguments, 1))
+            }
+        }
     };
 
     tabIn() {
@@ -118,6 +98,26 @@ class Console {
             }
             this.config.prefix = prefix
         }
+    };
+
+
+    info() {
+        this.out('info', ...arguments)
+    };
+    warn() {
+        this.out('warn', ...arguments)
+    };
+    error() {
+        this.out('error', ...arguments)
+    };
+
+    start() {
+        this.out('info', ...arguments)
+        this.tabIn()
+    };
+    end() {
+        this.tabOut()
+        this.out('info', ...arguments)
     };
 
 
