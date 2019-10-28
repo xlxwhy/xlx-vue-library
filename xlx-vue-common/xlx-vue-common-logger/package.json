@@ -1,0 +1,11 @@
+{
+  "name": "xlx-vue-common-logger",
+  "version": "0.1.2",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "babel": "babel -d ./lib ./src/"
+  },
+  "author": "",
+  "license": "ISC"
+}

@@ -1,0 +1,11 @@
+{
+  "name": "xlx-vue-common-http-api",
+  "version": "0.1.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "babel": "babel -d ./lib ./src/"
+  },
+  "author": "",
+  "license": "ISC"
+}
