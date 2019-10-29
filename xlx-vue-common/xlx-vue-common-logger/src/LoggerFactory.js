@@ -68,12 +68,17 @@ class Console {
             let wantLevelIndex = LEVEL.indexOf(level)
             let limitLevelIndex = LEVEL.indexOf(config.level)
             if (level && console[level] && limitLevelIndex <= wantLevelIndex) {
-                let type = level == 'info' ? " " : "X"
-                type = level == 'warn' ? "!" : type
-                console['info']("" + this.env, type + ":" + this.config.prefix, ...Array.prototype.slice.call(arguments, 1))
+                this.console(level, ...Array.prototype.slice.call(arguments, 1))
             }
         }
     };
+    console(level) {
+        let prefix = this.config.prefix
+        let type = level == 'info' ? "   " : "[x]"
+        type = level == 'warn' ? "[!]" : type
+        prefix = prefix ? " " + prefix : ""
+        console.info(type + ":" + this.env, type + ":" + prefix, ...Array.prototype.slice.call(arguments, 1))
+    }
 
     tabIn() {
         if (this.config.tab) {
