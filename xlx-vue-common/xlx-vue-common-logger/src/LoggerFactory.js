@@ -1,9 +1,31 @@
 
-export default {
-    newInstance: (env, options) => {
-        return new Console(env, options)
-    },
+
+const LEVEL = ['info', 'warn', 'error']
+const OPTIONS = {
+    length: 30,
+    show: true,
+    level: "info",
+    tab: "|->",
+    prefix: ""
 }
+
+
+export default {
+    OPTIONS: OPTIONS,
+    instances: [],
+    newInstance(env, options) {
+        let instance = new Console(env, options ? options : this.OPTIONS);
+        this.instances.push(instance)
+        return instance
+    },
+    initOptions(options) {
+        this.OPTIONS = options
+        for (const instance of this.instances) {
+            instance.init(options)
+        }
+    }
+}
+
 
 
 function fill(value, length, emptyChar) {
@@ -27,23 +49,16 @@ function cut(newEnvArray, max) {
     return newEnvArray
 }
 
-const LEVEL = ['info', 'warn', 'error']
-const CONFIG = {
-    length: 30,
-    show: true,
-    level: "info",
-    tab: "|->",
-    prefix: ""
-}
+
 class Console {
     constructor(env, options) {
         this._env = env;
         this.env = env;
-        this.config = Object.assign({}, CONFIG, options)
+        this.config = Object.assign({}, OPTIONS, options)
         this.init();
     };
     init(options) {
-        this.config = Object.assign({}, CONFIG, this.config, options)
+        this.config = Object.assign({}, OPTIONS, this.config, options)
         let env = this._env
         if (env) {
             let newEnvArray = []
