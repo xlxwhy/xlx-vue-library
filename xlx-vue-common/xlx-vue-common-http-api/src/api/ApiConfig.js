@@ -17,6 +17,8 @@ import PacketHandler from "../handler/config/PacketHandler.js";
 import PacketPathVariableHandler from "../handler/config/PacketPathVariableHandler.js";
 import OptionsResponseHandler from "../handler/response/OptionsResponseHandler.js";
 import ApiErrorHandler from "../handler/error/ApiErrorHandler.js";
+import AuthorizationHandler from "../handler/config/AuthorizationHandler.js";
+import PacketTimestampHandler from "../handler/config/PacketTimestampHandler.js";
 
 const config = Object.assign({}, AxiosConfig, {
     url: '/',
@@ -37,17 +39,15 @@ const config = Object.assign({}, AxiosConfig, {
         BaseUrlHandler,
         PacketHandler,
         PacketPathVariableHandler,
+        AuthorizationHandler,
+        PacketTimestampHandler,
     ],
-    customConfigHandlerOptions: {
-        pathVariablePrefix: ":"
-    },
+    customConfigHandlerOptions: {},
 
     customResponseHandlers: [
         OptionsResponseHandler
     ],
-    customResponseHandlerOptions: {
-
-    },
+    customResponseHandlerOptions: {},
     customErrorHandlers: [
         ApiErrorHandler
     ],
@@ -57,10 +57,55 @@ const config = Object.assign({}, AxiosConfig, {
 
     customLoggerOptions: {
         show: true,
-        level: "info",
+        level: "warn",
     },
 
 })
+
+
+
+// ConfigHandlerOptions: PacketPathVariableHandler's options
+config.customConfigHandlerOptions[PacketPathVariableHandler.name] = {
+    enable: true,
+    funcVariablePrefix: () => {
+        return ":"
+    },
+}
+
+// ConfigHandlerOptions: AuthorizationHandler's options
+config.customConfigHandlerOptions[AuthorizationHandler.name] = {
+    enable: true,
+    funcAuthorizationHeaderKey: function () {
+        return "Authorization"
+    },
+    funcAuthorizationSessionKey: function () {
+        return this.funcAuthorizationHeaderKey();
+    },
+    funcAuthorizationValue: function () {
+        return sessionStorage[this.funcAuthorizationSessionKey()]+"xxxxx"
+    }
+}
+
+// ConfigHandlerOptions: PacketPathVariableHandler's options
+config.customConfigHandlerOptions[PacketTimestampHandler.name] = {
+    enable: false,
+    funcMethods: () => {
+        return ['get']
+    },
+    funcTimestampKey: () => {
+        return "t"
+    },
+    funcTimestampValue: () => {
+        return new Date().getTime()
+    },
+}
+
+
+
+
+
+
+
 
 export default config
 

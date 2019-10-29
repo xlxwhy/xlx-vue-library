@@ -35,7 +35,7 @@ export default {
     // - invoke error handlers
     invoke(api, packet, options) {
         let config = Helper.merge({}, ApiConfig, options, api, { packet })
-        log.init(config.customLoggerOptions)
+        LoggerFactory.initOptions(config.customLoggerOptions)
         log.start("api request start!")
         log.info("before merge>api:", api)
         log.info("before merge>packet:", packet)
@@ -105,6 +105,8 @@ export default {
                     hasHandler = true;
                     handler.handle(options, config, res)
                     log.info(`handler[${name}] finished!`)
+                }else{
+                    log.warn(`handler[${name}] check false!`)
                 }
             } catch (error) {
                 log.error(`handler[${name}]: catch error:${error.message}`)
