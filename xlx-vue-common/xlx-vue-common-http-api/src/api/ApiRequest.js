@@ -17,7 +17,7 @@ export default {
     // just one thing i want to do here
     // - in catch block, response the same object[err.response] with then block
     request(options) {
-        log.start("axios request start!") 
+        log.start("axios request start!")
         log.info("axios options", options)
         return axios(options).then((res) => {
             log.info("axios response", res)
@@ -45,8 +45,8 @@ export default {
         this.handleConfig(config)
         return this.request(config).then((res) => {
             log.info("server response:", res)
-            this.handleResponse(res, config)
-            if (this.handleError(res, config)) {
+            this.handleResponse(config, res)
+            if (this.handleError(config, res)) {
                 log.error("found business error!")
                 return Promise.reject(res)
             } else {
@@ -54,73 +54,60 @@ export default {
             }
         }).catch((err) => {
             log.start("catch error start!", err)
-            this.handleResponse(err, config)
-            this.handleError(err, config)
+            this.handleResponse(config, err)
+            this.handleError(config, err)
             log.end("catch error end!", err)
             return Promise.reject(err)
-        }).finally(() => { 
+        }).finally(() => {
             log.end("api request end!")
         })
     },
 
     handleConfig(config) {
-        log.start("before handle config:", config)
-        let handlers = config.customConfigHandlers
-        let handlerConfig = config.customConfigHandlerOptions
-        if (!handlers || handlers.length == 0) {
-            log.info("no config handlers")
-            log.tabOut()
-            return
-        }
-        for (const handler of handlers) {
-            if (handler.check && handler.check(config)) {
-                let name = handler.name ? handler.name : "UNKOWN"
-                handler.handle(config)
-                log.info("handler [" + name + "] finished")
-            }
-        }
-        log.end("after handle config:", config)
+        return this.doHandlers(config, null, "customConfigHandlers")
     },
 
-    handleResponse(res, config) {
-        log.start("before handle response:", res)
-        let handlers = config.customResponseHandlers
-        let handlerConfig = config.customResponseHandlerOptions
-        if (!handlers || handlers.length == 0) {
-            log.end("no response handlers") 
-            return
-        }
-        for (const handler of handlers) {
-            if (handler.check && handler.check(res, config)) {
-                let name = handler.name ? handler.name : "UNKOWN"
-                handler.handle(res, config)
-                log.info("handler [" + name + "] finished")
-            }
-        }
-        log.end("after handle response:", res)
+    handleResponse(config, res) {
+        return this.doHandlers(config, res, "customResponseHandlers")
     },
 
-    handleError(res, config) {
-        log.start("before handle errors:", res)
-        let handlers = config.customErrorHandlers
-        let handlerConfig = config.customErrorHandlerOptions
-        if (!handlers || handlers.length == 0) {
-            log.end("no error handlers") 
-            return
-        }
-        let hasError = false;
+    handleError(config, res) {
+        return this.doHandlers(config, res, "customErrorHandlers")
+    },
 
+
+    doHandlers(config, res, handlerField) {
+        let handlers = config[handlerField]
+        if (!handlers || handlers.length == 0) {
+            log.info(`no ${handlerField} found!`)
+            return false
+        }
+        let hasHandler = false
+        log.start(`${handlerField} start!`)
+
+        let handlerOptionField = handlerField.substring(0, handlerField.length - 1) + "Options"
+        let handlersOptions = config[handlerOptionField]
         for (const handler of handlers) {
-            if (handler.check && handler.check(res)) {
-                let name = handler.name ? handler.name : "UNKOWN"
-                if (handler.handle(res)) {
-                    hasError = true
+            let name = handler.name ? handler.name : "UNKOWN"
+            let options = null;
+            // check options
+            if (handlersOptions) {
+                options = handlersOptions[name]
+                let disable = Helper.isNotEmpty(options) && Helper.isNotEmpty(options.enable) && !options.enable;
+                if (disable) {
+                    log.warn(`handler[${name}] disable!`)
+                    continue;
                 }
-                log.error("handler [" + name + "] finished")
+            }
+            // check and handle
+            if (handler.check && handler.check(config, res, options)) {
+                hasHandler = true;
+                handler.handle(config, res, options)
+                log.info(`handler[${name}] finished!`)
             }
         }
-        log.end("after handle errors:", res)
-        return hasError
+        log.end(`${handlerField} end!`)
+        return hasHandler
     },
 
 }

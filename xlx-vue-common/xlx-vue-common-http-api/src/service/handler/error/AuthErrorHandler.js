@@ -9,14 +9,14 @@ const log = LoggerFactory.newInstance("library.http.service.handler.error.AuthEr
 
 export default {
     name:"auth-error-handler",
-    check(res) {
+    check(config, res, option) {
         let code = (res && res.data && res.data.header) ? res.data.header.code : null
         let isAuthErrorCode = ServiceConst.ErrorCode.AUTH.indexOf(code) >= 0
         
         log.info(`check ${this.name}:`, isAuthErrorCode)
         return isAuthErrorCode
     },
-    handle(res) {
+    handle(config, res, option) {
         let error = this.getError(res)
         this.show(error)
         log.info(`handler ${this.name} error:`, error)

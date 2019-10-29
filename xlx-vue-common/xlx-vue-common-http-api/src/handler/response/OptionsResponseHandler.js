@@ -6,13 +6,13 @@ import Helper from "../../helper/Helper.js";
 
 export default {
     name: "response-options-handler",
-    check(res, config) {
+    check(config, res, option) {
         let isChecked = true;
         isChecked = Helper.isNotEmpty(res)
         return isChecked
     },
 
-    handle(res, config) {
+    handle(config, res, option) {
         res.options = config;
     },
 

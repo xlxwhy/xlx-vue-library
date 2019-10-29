@@ -1,23 +1,32 @@
 
-import ServiceErrors from "../../consts/ServiceErrors";
+import ServiceErrors from "../../consts/ServiceErrors.js";
 import ServiceConst from "../../consts/ServiceConst"
 import LoggerFactory from "xlx-vue-common-logger";
-const log = LoggerFactory.newInstance("library.http.service.handler.error.BusinessErrorHandler")
+import Helper from "../../helper/Helper.js";
+import HandlerHelper from "../../helper/HandlerHelper.js";
+
+const log = LoggerFactory.newInstance("library.http.service.handler.error.AuthErrorHandler")
+
+
 
 export default {
-    name: "business-error-handler",
+    name: "access-token-expire-handler",
     check(config, res, option) {
+
+        
+        let checked = false; 
+        checked = HandlerHelper.isEnable(config.customResponseHandlerOptions)
+
+
         let code = (res && res.data && res.data.header) ? res.data.header.code : null
         let isAuthErrorCode = ServiceConst.ErrorCode.AUTH.indexOf(code) >= 0
-        let isSuccessCode = ServiceConst.ErrorCode.SUCCESS.indexOf(code) >= 0
-        let isBusinessErrorCode = code && !isSuccessCode && !isAuthErrorCode
-        log.info(`check ${this.name}:`, isBusinessErrorCode)
-        return isBusinessErrorCode
+
+        log.info(`check ${this.name}:`, isAuthErrorCode)
+        return isAuthErrorCode
     },
     handle(config, res, option) {
         let error = this.getError(res)
         this.show(error)
-
         log.info(`handler ${this.name} error:`, error)
         return error;
     },
@@ -31,10 +40,8 @@ export default {
     },
 
     show(error) {
- 
+
     },
 
 }
-
-
 
