@@ -5,14 +5,14 @@ const log = LoggerFactory.newInstance("library.http.service.handler.config.Packe
 
 export default {
     name: "config-packet-timestamp-handler",
-    check(config) {
+    check(options, config) {
         let isGetMethod = config.method.toLowerCase() == "get";
 
         log.info(`check ${this.name}:`, isGetMethod)
         return isGetMethod
     },
 
-    handle(config) {
+    handle(options, config) {
         let params = { t: new Date().getTime() }
         Helper.merge(config, { params })
 

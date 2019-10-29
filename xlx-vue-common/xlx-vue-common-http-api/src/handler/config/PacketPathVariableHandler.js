@@ -8,7 +8,7 @@ import Helper from "../../helper/Helper.js";
 
 export default {
     name:"config-packet-path-variable-handler",
-    check(config) {
+    check(options, config) {
         let isChecked = true;
         isChecked &= Helper.isNotEmptyField(config, 'packet', 'path') 
         isChecked &= Helper.isNotEmptyField(config, 'customConfigHandlerOptions', 'pathVariablePrefix') 
@@ -18,7 +18,7 @@ export default {
         return isChecked
     },
 
-    handle(config) {
+    handle(options, config) {
         let url = config.url
         for (let key in config.packet.path) {
             url = url.replace(new RegExp(config.customConfigHandlerOptions.pathVariablePrefix + key, "g"), config.packet.path[key])

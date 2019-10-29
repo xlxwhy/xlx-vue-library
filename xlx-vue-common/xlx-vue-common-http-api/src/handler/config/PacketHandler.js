@@ -6,11 +6,11 @@ import Helper from "../../helper/Helper.js";
 
 export default {
     name:"config-packet-handler",
-    check(config) {
+    check(options, config) {
         return !Helper.isEmpty(config.packet)
     },
 
-    handle(config) {
+    handle(options, config) {
         if (!Helper.isEmpty(config.packet.query)) {
             config.params = config.packet.query
         }

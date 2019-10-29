@@ -64,19 +64,19 @@ export default {
     },
 
     handleConfig(config) {
-        return this.doHandlers(config, null, "customConfigHandlers")
+        return this.doHandlers("customConfigHandlers", config)
     },
 
     handleResponse(config, res) {
-        return this.doHandlers(config, res, "customResponseHandlers")
+        return this.doHandlers("customResponseHandlers", config, res)
     },
 
     handleError(config, res) {
-        return this.doHandlers(config, res, "customErrorHandlers")
+        return this.doHandlers("customErrorHandlers", config, res)
     },
 
 
-    doHandlers(config, res, handlerField) {
+    doHandlers(handlerField, config, res) {
         let handlers = config[handlerField]
         if (!handlers || handlers.length == 0) {
             log.info(`no ${handlerField} found!`)
@@ -100,10 +100,15 @@ export default {
                 }
             }
             // check and handle
-            if (handler.check && handler.check(config, res, options)) {
-                hasHandler = true;
-                handler.handle(config, res, options)
-                log.info(`handler[${name}] finished!`)
+            try {
+                if (handler.check && handler.check(options, config, res)) {
+                    hasHandler = true;
+                    handler.handle(options, config, res)
+                    log.info(`handler[${name}] finished!`)
+                }
+            } catch (error) {
+                log.error(`handler[${name}]: catch error:${error.message}`)
+                console.info(error);
             }
         }
         log.end(`${handlerField} end!`)

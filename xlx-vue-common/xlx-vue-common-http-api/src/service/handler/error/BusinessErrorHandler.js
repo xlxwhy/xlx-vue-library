@@ -6,7 +6,7 @@ const log = LoggerFactory.newInstance("library.http.service.handler.error.Busine
 
 export default {
     name: "business-error-handler",
-    check(config, res, option) {
+    check(options, config, res) {
         let code = (res && res.data && res.data.header) ? res.data.header.code : null
         let isAuthErrorCode = ServiceConst.ErrorCode.AUTH.indexOf(code) >= 0
         let isSuccessCode = ServiceConst.ErrorCode.SUCCESS.indexOf(code) >= 0
@@ -14,7 +14,7 @@ export default {
         log.info(`check ${this.name}:`, isBusinessErrorCode)
         return isBusinessErrorCode
     },
-    handle(config, res, option) {
+    handle(options, config, res) {
         let error = this.getError(res)
         this.show(error)
 

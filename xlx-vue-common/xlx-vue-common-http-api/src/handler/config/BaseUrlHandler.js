@@ -3,13 +3,13 @@ import Helper from "../../helper/Helper.js";
 
 export default {
     name:"config-base-url-handler",
-    check(config) {
+    check(options, config) {
         let isChecked = true;
         isChecked &= Helper.isNotEmpty(config.base)
         return isChecked
     },
 
-    handle(config) { 
+    handle(options, config) {
         config.baseURL = config.base
     },
 }

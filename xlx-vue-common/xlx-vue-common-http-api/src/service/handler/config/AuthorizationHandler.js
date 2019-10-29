@@ -7,7 +7,8 @@ const log = LoggerFactory.newInstance("library.http.service.handler.config.Autho
 
 export default {
     name:"authorization-handler",
-    check(config) {
+    check(options, config) {
+        
         let isChecked = true;
         isChecked &= Helper.isNotEmpty(config.funcAuthorizationValue)
         isChecked &= Helper.isNotEmpty(config.authorizationHeaderKey) 
@@ -16,7 +17,9 @@ export default {
         return isChecked
     },
 
-    handle(config) {
+    handle(options, config) {
+        console.log(options,config);
+        
         let headers = {}
         headers[config.authorizationHeaderKey] = config.funcAuthorizationValue(config) + "xx" 
         Helper.merge(config, { headers }) 

@@ -7,13 +7,13 @@ const log = LoggerFactory.newInstance("library.http.service.handler.error.Common
 
 export default {
     name: "common-error-handler",
-    check(config, res, option) {
+    check(options, config, res) {
         let checked = true;
         checked = (res && res.status && res.status >= 400)
         log.info("check common error :", checked)
         return checked
     },
-    handle(config, res, option) {
+    handle(options, config, res) {
         log.info("handle common error start")
         let httpError = null
         let message = null

@@ -11,7 +11,7 @@ const log = LoggerFactory.newInstance("library.http.service.handler.error.AuthEr
 
 export default {
     name: "access-token-expire-handler",
-    check(config, res, option) {
+    check(options, config, res) {
 
         
         let checked = false; 
@@ -24,7 +24,7 @@ export default {
         log.info(`check ${this.name}:`, isAuthErrorCode)
         return isAuthErrorCode
     },
-    handle(config, res, option) {
+    handle(options, config, res) {
         let error = this.getError(res)
         this.show(error)
         log.info(`handler ${this.name} error:`, error)
