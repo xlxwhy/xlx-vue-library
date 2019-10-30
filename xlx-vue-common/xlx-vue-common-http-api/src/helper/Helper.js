@@ -4,7 +4,6 @@ import LoggerFactory from "xlx-vue-common-logger";
 
 const log = LoggerFactory.newInstance("xlx.vue.common.http.helper.Helper")
 
-
 export default {
     isEmpty(v) {
         return v == undefined || v == null
@@ -40,7 +39,9 @@ export default {
             aos = Array.prototype.slice.call(arguments, 1)
         }
         aos.forEach(element => {
-            mo = this.mergeProperty(mo, element)
+            if (element) {
+                mo = this.mergeProperty(mo, element)
+            }
         });
         return mo
     },
@@ -63,6 +64,7 @@ export default {
     mergeProperty() {
         let mo = arguments[0]
         let ao = arguments[1]
+        let privateKeys = (ao && ao.privateKeys) ? ao.privateKeys : {}
         let keys = []
         if (arguments.length > 2) {
             keys = Array.prototype.slice.call(arguments, 2)
@@ -70,6 +72,7 @@ export default {
             keys = Object.getOwnPropertyNames(ao)
         }
         for (const key of keys) {
+            if (privateKeys[key]) { continue; }
             const value = ao[key]
             if (this.isEmpty(value)) continue;
             if (Array.isArray(value)) {

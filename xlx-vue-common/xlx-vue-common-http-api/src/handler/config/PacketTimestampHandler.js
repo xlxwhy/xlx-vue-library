@@ -20,6 +20,8 @@ export default {
         params[options.funcTimestampKey()] = options.funcTimestampValue(config)
         Helper.merge(config, { params })
         log.info("handler final config:", config)
+        
+        return Promise.resolve(config)
     },
 }
 

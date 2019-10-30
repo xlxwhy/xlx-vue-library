@@ -8,10 +8,12 @@ const log = LoggerFactory.newInstance("xlx.vue.common.http.handler.error.ApiErro
 export default {
     name: "api-error-handler",
     check(options, config, res) {
-        return true
+        return false
     },
     handle(options, config, res) {
-        return null;
+   
+        
+        return Promise.resolve(res)
     },
 
 }

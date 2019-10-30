@@ -21,7 +21,7 @@ export default {
         log.info("authorization headers:", headers)
         Helper.merge(config, { headers })
         log.info("handler final config:", config)
-        return config
+        return Promise.resolve(config)
     },
 }
 

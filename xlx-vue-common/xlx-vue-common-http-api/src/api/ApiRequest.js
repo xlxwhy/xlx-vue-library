@@ -10,9 +10,9 @@ import LoggerFactory from "xlx-vue-common-logger";
 // axios.interceptors.response.use(ApiResponseInterceptor.response, ApiResponseInterceptor.error)
 
 const log = LoggerFactory.newInstance("xlx.vue.common.http.api.ApiRequest")
+let couter = 0;
 
 export default {
-
 
     // just one thing i want to do here
     // - in catch block, response the same object[err.response] with then block
@@ -33,7 +33,7 @@ export default {
     // - invoke config handlers
     // - invoke reponse handlers
     // - invoke error handlers
-    invoke(api, packet, options) {
+    async invoke(api, packet, options) {
         let config = Helper.merge({}, ApiConfig, options, api, { packet })
         LoggerFactory.initOptions(config.customLoggerOptions)
         log.start("api request start!")
@@ -42,25 +42,39 @@ export default {
         log.info("before merge>options:", options)
         log.info("before merge>ApiConfig:", ApiConfig)
         log.info("final config:", config)
-        this.handleConfig(config)
-        return this.request(config).then((res) => {
+        await this.handleConfig(config)
+        couter++
+        if (config.interrupt || couter > 10) {
+            return this.interrupt({
+                options: config,
+                data: config.interruptMessage,
+                status: 400,
+                statusText: "Interrupt this invoke because some fatal errors. Please check the console informations carefully! ",
+            })
+        }
+        return this.request(config).then(async (res) => {
             log.info("server response:", res)
-            this.handleResponse(config, res)
-            if (this.handleError(config, res)) {
+            await this.handleResponse(config, res)
+            let hasError = await this.handleError(config, res)
+            if (hasError) {
                 log.error("found business error!")
                 return Promise.reject(res)
             } else {
                 return Promise.resolve(res)
             }
-        }).catch((err) => {
+        }).catch(async (err) => {
             log.start("catch error start!", err)
-            this.handleResponse(config, err)
-            this.handleError(config, err)
+            await this.handleResponse(config, err)
+            await this.handleError(config, err)
             log.end("catch error end!", err)
             return Promise.reject(err)
         }).finally(() => {
             log.end("api request end!")
         })
+    },
+
+    interrupt(res) {
+        return Promise.reject(res)
     },
 
     handleConfig(config) {
@@ -76,7 +90,7 @@ export default {
     },
 
 
-    doHandlers(handlerField, config, res) {
+    async doHandlers(handlerField, config, res) {
         let handlers = config[handlerField]
         if (!handlers || handlers.length == 0) {
             log.info(`no ${handlerField} found!`)
@@ -103,9 +117,9 @@ export default {
             try {
                 if (handler.check && handler.check(options, config, res)) {
                     hasHandler = true;
-                    handler.handle(options, config, res)
+                    await handler.handle(options, config, res)
                     log.info(`handler[${name}] finished!`)
-                }else{
+                } else {
                     log.warn(`handler[${name}] check false!`)
                 }
             } catch (error) {
@@ -116,6 +130,56 @@ export default {
         log.end(`${handlerField} end!`)
         return hasHandler
     },
+
+    async doInvokeHandlers(phase, config, res) {
+        let handlers = config.invokeHandlers
+        let handlerOptions = config.invokeHandlerOptions
+        if (!handlers || handlers.length == 0) {
+            log.info(`no invoke handler found!`)
+            return false
+        }
+
+        let hasHandler = false
+        log.start(`invoke ${phase} handler start`)
+        for (const handler of handlers) {
+            let name = handler.name ? handler.name : "UNKOWN"
+            let options = null;
+            // check options
+            if (handlerOptions) {
+                options = handlerOptions[name]
+                let disable = Helper.isNotEmpty(options) && Helper.isNotEmpty(options.enable) && !options.enable;
+                if (disable) {
+                    log.info(`handler [${name}] disable!`)
+                    continue;
+                }
+            }
+            // check phase handler
+            let phaseName = `${name}.${phase}`
+            let phaseHandler = handler[phase]
+            if (!phaseHandler) {
+                log.info(`${phaseName} not found`)
+                continue;
+            }
+            try {
+                if (phaseHandler.check && phaseHandler.check(options, config, res)) {
+                    hasHandler = true;
+                    await phaseHandler.handle(options, config, res)
+                    log.info(`${phaseName} finished`)
+                } else {
+                    log.info(`${phaseName} check false`)
+                }
+            } catch (error) {
+                
+                log.info(`${phaseName} error`)
+                log.error(`phase-handler[${name}.${phase}] catch error:${error.message}`)
+                console.info(error);
+            }
+        }
+        log.end(`${handlerField} end!`)
+        return hasHandler
+    },
+
+
 
 }
 

@@ -19,6 +19,8 @@ import OptionsResponseHandler from "../handler/response/OptionsResponseHandler.j
 import ApiErrorHandler from "../handler/error/ApiErrorHandler.js";
 import AuthorizationHandler from "../handler/config/AuthorizationHandler.js";
 import PacketTimestampHandler from "../handler/config/PacketTimestampHandler.js";
+import AccessTokenExpireHandler from "../handler/response/AccessTokenExpireHandler.js";
+import InvokeMonitorHandler from "../handler/InvokeMonitorHandler.js";
 
 const config = Object.assign({}, AxiosConfig, {
     url: '/',
@@ -27,7 +29,8 @@ const config = Object.assign({}, AxiosConfig, {
     responseType: 'json',
     timeout: 15000,
     headers: {
-        'X-Requested-With': 'XMLHttpRequest'
+        'X-Requested-With': 'XMLHttpRequest',
+        'Content-Type': 'application/json;charset=UTF-8',
     },
     packet: {
         path: {},
@@ -35,17 +38,29 @@ const config = Object.assign({}, AxiosConfig, {
         body: {}
     },
 
+    invokeHandlers: [
+        InvokeMonitorHandler,
+    ],
+    invokeHandlerOptions: {
+
+
+    },
+
+
+
     customConfigHandlers: [
         BaseUrlHandler,
         PacketHandler,
         PacketPathVariableHandler,
         AuthorizationHandler,
         PacketTimestampHandler,
+        InvokeCounterHandler,
     ],
     customConfigHandlerOptions: {},
 
     customResponseHandlers: [
-        OptionsResponseHandler
+        OptionsResponseHandler,
+        AccessTokenExpireHandler,
     ],
     customResponseHandlerOptions: {},
     customErrorHandlers: [
@@ -57,10 +72,17 @@ const config = Object.assign({}, AxiosConfig, {
 
     customLoggerOptions: {
         show: true,
-        level: "warn",
+        level: "info",
     },
 
 })
+
+
+
+// InvokeHandlerOptions: InvokeMonitorHandler's options
+config.invokeHandlerOptions[InvokeMonitorHandler.name] = {
+    limit: 10,
+}
 
 
 
@@ -82,7 +104,8 @@ config.customConfigHandlerOptions[AuthorizationHandler.name] = {
         return this.funcAuthorizationHeaderKey();
     },
     funcAuthorizationValue: function () {
-        return sessionStorage[this.funcAuthorizationSessionKey()]+"xxxxx"
+        // return sessionStorage[this.funcAuthorizationSessionKey()]
+        return "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJVU0VSSUQiOjExNzcxMTA1NzY1NDA5OTU1ODUsIlVTRVJOQU1FIjoiYWRtaW4iLCJpc3MiOiJXYXBwaW4iLCJhdWQiOiIwOThmNmJjZDQ2MjFkMzczY2FkZTRlODMyNjI3YjRmNiIsImV4cCI6MTU3MjYxMjg1MiwibmJmIjoxNTcyMzUzNjUyfQ.qIDlbOpXzkL7wZhkEGLOGm0eaMU0IqlXe7UQpn5mGBQ"
     }
 }
 
@@ -100,6 +123,38 @@ config.customConfigHandlerOptions[PacketTimestampHandler.name] = {
     },
 }
 
+// ConfigHandlerOptions: InvokeCounterHandler's options
+config.customConfigHandlerOptions[InvokeCounterHandler.name] = {
+    enable: false,
+    invokeCounter: 0,
+    invokeLimit: 2,
+}
+
+
+
+
+// ResponseHandlerOptions: AccessTokenExpireHandler's options
+config.customConfigHandlerOptions[AccessTokenExpireHandler.name] = {
+    enable: false,
+    funcIsExpire: (config, res) => {
+        return false
+    },
+    funcSaveToken: (token) => {
+        sessionStorage['API-ACCESS-TOKEN'] = token
+    },
+    funcRefreshTokenApi: (config, res) => {
+        // use the correct api
+        return Api.post("/api/token/refresh")
+    },
+    funcRefreshTokenPacket: (config, res) => {
+        return {
+            body: {
+                access_token: sessionStorage['API-ACCESS-TOKEN'],
+                refresh_token: sessionStorage['API-REFRESH-TOKEN'],
+            }
+        }
+    },
+}
 
 
 

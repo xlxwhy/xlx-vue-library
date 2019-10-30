@@ -2,7 +2,7 @@
 import Helper from "../../helper/Helper.js";
 
 export default {
-    name:"config-base-url-handler",
+    name: "config-base-url-handler",
     check(options, config) {
         let isChecked = true;
         isChecked &= Helper.isNotEmpty(config.base)
@@ -11,6 +11,8 @@ export default {
 
     handle(options, config) {
         config.baseURL = config.base
+
+        return Promise.resolve(config)
     },
 }
 

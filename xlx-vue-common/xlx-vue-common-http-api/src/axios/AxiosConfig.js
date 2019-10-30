@@ -17,18 +17,19 @@ export default {
     // The last function in the array must return a string or an instance of Buffer, ArrayBuffer,
     // FormData or Stream
     // You may modify the headers object.
-    transformRequest: [function (data, headers) {
-        // Do whatever you want to transform the data
-        return data;
-    }],
+    // !!! bug ???
+    // transformRequest: [function (data, headers) {
+    //     // Do whatever you want to transform the data
+    //     return data;
+    // }],
 
     // `transformResponse` allows changes to the response data to be made before
     // it is passed to then/catch
-    transformResponse: [function (data) {
-        // Do whatever you want to transform the data
+    // transformResponse: [function (data) {
+    //     // Do whatever you want to transform the data
 
-        return data;
-    }],
+    //     return data;
+    // }],
 
     // `headers` are custom headers to be sent
     headers: { 'X-Requested-With': 'XMLHttpRequest' },
@@ -41,9 +42,9 @@ export default {
 
     // `paramsSerializer` is an optional function in charge of serializing `params`
     // (e.g. https://www.npmjs.com/package/qs, http://api.jquery.com/jquery.param/)
-    paramsSerializer: function (params) {
-        return Qs.stringify(params, { arrayFormat: 'brackets' })
-    },
+    // paramsSerializer: function (params) {
+    //     return Qs.stringify(params, { arrayFormat: 'brackets' })
+    // },
 
     // `data` is the data to be sent as the request body
     // Only applicable for request methods 'PUT', 'POST', and 'PATCH'
@@ -100,14 +101,14 @@ export default {
     xsrfHeaderName: 'X-XSRF-TOKEN', // default
 
     // `onUploadProgress` allows handling of progress events for uploads
-    onUploadProgress: function (progressEvent) {
-        // Do whatever you want with the native progress event
-    },
+    // onUploadProgress: function (progressEvent) {
+    //     // Do whatever you want with the native progress event
+    // },
 
     // `onDownloadProgress` allows handling of progress events for downloads
-    onDownloadProgress: function (progressEvent) {
-        // Do whatever you want with the native progress event
-    },
+    // onDownloadProgress: function (progressEvent) {
+    //     // Do whatever you want with the native progress event
+    // },
 
     // `maxContentLength` defines the max size of the http response content in bytes allowed
     // maxContentLength: 2000,

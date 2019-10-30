@@ -28,6 +28,8 @@ export default {
             url = url.replace(new RegExp(options.funcVariablePrefix() + key, "g"), config.packet.path[key])
         }
         config.url = url
+        
+        return Promise.resolve(config)
     },
 }
 

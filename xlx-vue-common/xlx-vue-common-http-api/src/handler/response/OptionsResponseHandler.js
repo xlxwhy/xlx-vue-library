@@ -14,6 +14,7 @@ export default {
 
     handle(options, config, res) {
         res.options = config;
+        return Promise.resolve(res)
     },
 
 }

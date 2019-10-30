@@ -17,6 +17,8 @@ export default {
         if (!Helper.isEmpty(config.packet.body)) {
             config.data = config.packet.body
         }
+        
+        return Promise.resolve(config)
     },
 
 }
